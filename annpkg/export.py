@@ -1,14 +1,28 @@
-#import pytz
+"""
+The export writer
+=================
+Slow as f***
+"""
 import threading
 import heapq
 import copy
-#import matplotlib.dates as dates
 import calendar
 import numpy
 from helper import _from_ordinalf
 import dateutil.tz as tz
 
 class ExportWriter(threading.Thread):
+    """
+    The thread writing the data to be exported.
+    
+    :param fn: The filename to write tto
+    :type fn: :class:`str`
+    :param sources: The sources from which to fetch the exported data
+    :type sources: [:class:`annpkg.sources.Source`]
+    :param cb: A status callback. Is called multiple times with the percentage of the data exported.
+    :type cb: :class:`float` -> ()
+    :param end_cb: A callback that is called without arguments when the process finished.
+    """
     def __init__(self,fn,sources,annotations,cb,end_cb):
         threading.Thread.__init__(self)
         self.fn = fn

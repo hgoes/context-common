@@ -1,3 +1,7 @@
+"""
+The data model
+==============
+"""
 import tarfile
 from xml.dom import minidom
 #import matplotlib.dates as dates

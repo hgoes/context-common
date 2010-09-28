@@ -47,7 +47,10 @@ class NumpySrc:
         self.fac = chans * arr.dtype.itemsize
         self.el.set_property("size",l * chans * arr.dtype.itemsize)
         self.el.set_property("format",gst.FORMAT_TIME)
-        capstr = "audio/x-raw-int,width=%d,depth=%d,rate=%d,channels=%d,endianness=1234,signed=true"%(arr.dtype.itemsize*8,arr.dtype.itemsize*8,rate,chans)
+        capstr = "audio/x-raw-int,width=%d,depth=%d,rate=%d,channels=%d,endianness=1234,signed=true"%(arr.dtype.itemsize*8,
+                                                                                                      arr.dtype.itemsize*8,
+                                                                                                      rate,
+                                                                                                      chans)
         self.el.set_property("caps",gst.caps_from_string(capstr))
         self.el.set_property("stream-type",1) # Seekable
         self.el.connect("need-data",self.need_data)
@@ -56,7 +59,6 @@ class NumpySrc:
         if self.pos >= self.arr.shape[0]:
             el.emit("end-of-stream")
         else:
-            sz = 1024 * self.fac
             buf = gst.Buffer(numpy.getbuffer(self.arr,self.pos*self.fac,1024*self.fac))
             buf.timestamp = self.pos * self.per_sample
             buf.duration = int(1024*self.per_sample)

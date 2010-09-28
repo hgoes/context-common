@@ -1,3 +1,7 @@
+"""
+The sources
+===========
+"""
 import gst
 import gst_numpy
 import threading
@@ -375,6 +379,10 @@ all_sources = [AudioSource,MovementSource]
 
 #all_sources = [AudioSource,MovementSource,SpeedSource]
 def source_by_name(name):
+    """
+    Get the source for a given name.
+    This is used to find the right class for a source definition in an annotation package.
+    """
     for src in all_sources:
         if src.source_type_id() == name:
             return src
