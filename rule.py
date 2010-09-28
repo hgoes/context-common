@@ -3,9 +3,11 @@ from math import exp
 from ConfigParser import ConfigParser
 
 class ClassifierSet:
-    def __init__(self,classifiers,tp='movement'):
+    def __init__(self,classifiers,tp='movement',
+                 semantics=["mean_x1","mean_y1","mean_z1","mean_x2","mean_y2","mean_z2","var_x1","var_y1","var_z1","var_x2","var_y2","var_z2","last"]):
         self.classifiers = [ c for c in classifiers ]
         self.type = tp
+        self.semantics = semantics
     def step(self,v):
         pos = 0
         rst = None
@@ -28,6 +30,7 @@ class ClassifierSet:
         return self.classifiers[0].dimension()
     def to_json(self):
         return { 'type' : self.type,
+                 'semantics' : self.semantics,
                  'dimension' : self.dimension(),
                  'classifier' : [ cl.to_json() for cl in self.classifiers ]
                  }
@@ -35,8 +38,9 @@ class ClassifierSet:
     def from_json(node):
         dim = node['dimension']
         tp = node['type']
+        sem = node['semantics']
         classifier = [ Classifier.from_json(cl,dim) for cl in node['classifier'] ]
-        return ClassifierSet(classifier,tp)
+        return ClassifierSet(classifier,tp,semantics)
 
 def fuzzy(avg,var,x):
     return max(0,1 - abs(avg-x)/var)
