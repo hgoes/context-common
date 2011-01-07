@@ -144,10 +144,19 @@ class Rule:
         self.rvec = rvec
         self.roff = roff
         self.bitvec = bitvec
+    def set_bitvec(self,bv):
+        self.bitvec = bv
     def evaluate(self,v):
+        #if self.bitvec is not None:
+        #    v = np.copy(v)
+        #    v.put(self.bitvec,0.0)
         return np.vdot(self.rvec,v) + self.roff
     def evaluates(self,vs):
-        return np.sum(vs*self.rvec,1) + self.roff
+        t = vs*self.rvec
+        #if self.bitvec is not None:
+        #    for i in self.bitvec:
+        #        t[:,i] = 0.0
+        return np.sum(t,1) + self.roff
     def weight(self,v):
         t = np.array([v - self.means()])
         if self.bitvec is not None:
@@ -155,6 +164,9 @@ class Rule:
         return exp(-0.5*(np.dot(np.dot(t,self.variance()),t.T))[0,0])
     def weights(self,vs):
         t = vs - self.means()
+        if self.bitvec is not None:
+            for i in self.bitvec:
+                t[:,i] = 0.0
         return np.exp(-0.5*(np.sum(np.dot(t,self.variance())*t,1)))
     def means(self):
         abstract
