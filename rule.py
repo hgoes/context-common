@@ -1,8 +1,15 @@
+"""
+The rule system
+===============
+"""
 import numpy as np
 from math import exp
 from ConfigParser import ConfigParser
 
 class ClassifierSet:
+    """
+    A classifier set contains a list of classifiers and attached semantics
+    """
     def __init__(self,classifiers,tp='movement',
                  semantics=["mean_x1","mean_y1","mean_z1","mean_x2","mean_y2","mean_z2","var_x1","var_y1","var_z1","var_x2","var_y2","var_z2","last"]):
         self.classifiers = [ c for c in classifiers ]
@@ -173,6 +180,9 @@ class SimpleRule(Rule):
         return np.array(np.diag([1/v for (m,v) in self.rules]))
 
 class ComplexRule(Rule):
+    """
+    A representation of a rule represented by a result vector, a result offset, a mean vector and a covariance matrix.
+    """
     def __init__(self,rvec,roff,vmean,covar,bitvec=None):
         Rule.__init__(self,rvec,roff,bitvec)
         self.vmean = vmean
