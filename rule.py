@@ -67,6 +67,12 @@ class ClassifierSet:
             roff = cons[-1]
             rules.append(ComplexRule(result,roff,means,var,bitvec))
         return RuleSet(rules)
+    def to_ini(self,prefix):
+        for cl in self.classifiers:
+            p = ConfigParser()
+            cl.to_ini(p)
+            with open(prefix+cl.name,'w') as h:
+                p.write(h)
 
 def fuzzy(avg,var,x):
     return max(0,1 - abs(avg-x)/var)
@@ -95,6 +101,9 @@ class Classifier:
                  'name' : self.name,
                  'mapping' : [ { 'class' : k, 'value' : float(v) } for (k,v) in self.membership ]
                  }
+    def to_ini(self,cfgparser):
+        cfgparser.set("DEFAULT","dimension",self.dimension())
+        self.ruleset.to_ini(cfgparser)        
     @staticmethod
     def from_json(node,dim):
         rset = RuleSet.from_json(node['rules'],dim)
@@ -132,6 +141,9 @@ class RuleSet:
         return self.rules[0].dimension()
     def to_json(self):
         return [ rule.to_json() for rule in self.rules ]
+    def to_ini(self,cfgparser):
+        for i,rule in enumerate(self.rules):
+            rule.to_ini(cfgparser,i)
     @staticmethod
     def from_json(node,dim):
         return RuleSet([ ComplexRule.from_json(nd,dim) for nd in node])
@@ -212,3 +224,11 @@ class ComplexRule(Rule):
         mean = np.array(node['mean'])
         conseq = np.array(node['consequence'])
         return ComplexRule(conseq[0:-1],conseq[-1],mean,sigma)
+    def to_ini(self,cfgparser,i):
+        sect = "RULE"+str(i)
+        cfgparser.add_section(sect)
+        cfgparser.set(sect,"means"," ".join(map(str,self.vmean.flatten())))
+        cfgparser.set(sect,"sigma"," ".join(map(str,self.covar.flatten())))
+        cfgparser.set(sect,"consequence"," ".join(map(str,np.hstack([self.rvec,[self.roff]]))))
+        if self.bitvec is not None:
+            cfgparser.set(sect,"bitvec"," ".join(map(str,self.bitvec)))
