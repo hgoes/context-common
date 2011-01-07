@@ -45,9 +45,12 @@ class ClassifierSet:
     def from_json(node):
         dim = node['dimension']
         tp = node['type']
-        sem = node['semantics']
+        if 'semantics' in node:
+            sem = node['semantics']
+        else:
+            sem = None
         classifier = [ Classifier.from_json(cl,dim) for cl in node['classifier'] ]
-        return ClassifierSet(classifier,tp,semantics)
+        return ClassifierSet(classifier,tp,sem)
     @staticmethod
     def from_ini(cfgparser):
         dims = cfgparser.getint("DEFAULT","dimensions")
