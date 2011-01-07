@@ -108,8 +108,6 @@ class RuleSet:
         for rule in self.rules:
             w = rule.weight(v)
             e = rule.evaluate(v)
-            print "Weight",w
-            print "Res",e
             r += w*e
             d += w
         return r/d
