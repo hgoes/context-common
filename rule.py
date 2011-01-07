@@ -41,6 +41,22 @@ class ClassifierSet:
         sem = node['semantics']
         classifier = [ Classifier.from_json(cl,dim) for cl in node['classifier'] ]
         return ClassifierSet(classifier,tp,semantics)
+    @staticmethod
+    def from_ini(cfgparser):
+        dims = cfgparser.getint("DEFAULT","dimensions")
+        rules = []
+        for rule in cfgparser.sections():
+            means = np.array(map(float,cfgparser.get(rule,"mean").split()))
+            var = np.array(map(float,cfgparser.get(rule,"sigma").split()))
+            cons = map(float,cfgparser.get(rule,"consequence").split())
+            if cfgparser.has_option(rule,"bitvec"):
+                bitvec = np.array(map(bit,cfgparser.get(rule,"bitvec").split())).nonzero()
+            else:
+                bitvec = None
+            result = np.array(cons[0:-1])
+            roff = cons[-1]
+            rules.append(ComplexRule(result,roff,means,var,bitvec))
+        return RuleSet(rules)
 
 def fuzzy(avg,var,x):
     return max(0,1 - abs(avg-x)/var)
@@ -117,25 +133,6 @@ def bit(str):
         return 1
     else:
         return 0
-
-def parse_rules(f):
-    cfgparser = ConfigParser()
-    cfgparser.readfp(open(f))
-    dims=cfgparser.getint("DEFAULT","dimensions")
-    rules = []
-    for rule in cfgparser.sections():
-        means = np.array(map(float,cfgparser.get(rule,"mean").split()))
-        var = np.array(map(float,cfgparser.get(rule,"sigma").split())).reshape((dims,dims))
-        cons = map(float,cfgparser.get(rule,"consequence").split())
-        if cfgparser.has_option(rule,"bitvec"):
-            bitvec = np.array(map(bit,cfgparser.get(rule,"bitvec").split())).nonzero()
-        else:
-            bitvec = None
-        bitvec = None
-        result = np.array(cons[0:-1])
-        roff = cons[-1]
-        rules.append(ComplexRule(result,roff,means,var,bitvec))
-    return RuleSet(rules)
 
 class Rule:
     def __init__(self,rvec,roff,bitvec=None):
