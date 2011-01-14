@@ -110,6 +110,12 @@ class Source:
         :returns: A one or two letter identifier for the source
         """
         abstract
+    @staticmethod
+    def from_short_name(name,timedata,data):
+        """
+        Returns the source or None if the name doesn't match
+        """
+        return None
 
 class UnknownSource(Source):
     def __init__(self,handle,rootname,attrs):
@@ -374,6 +380,12 @@ class MovementSource(Source):
         return self.xdata.shape[0] / 8
     def get_preprocessed_width(self):
         return 6
+    @staticmethod
+    def from_short_name(name,timedata,data):
+        if name[0] != 'm':
+            return None
+        return MovementSource(name,name,timedata,data,int(name[1:]))
+            
             
 all_sources = [AudioSource,MovementSource]
 
@@ -387,3 +399,12 @@ def source_by_name(name):
         if src.source_type_id() == name:
             return src
     return UnknownSource
+
+def source_from_short_name(name,timedata,data):
+    for src in all_sources:
+        res = src.from_short_name(name,timedata,data)
+        if res is not None:
+            return res
+    return UnknownSource()
+
+    
