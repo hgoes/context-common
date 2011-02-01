@@ -92,20 +92,27 @@ class AnnPkg:
             if source.short_name() == name:
                 return source
         return None
+    def get_sources_by_type_id(self,tid):
+        res = []
+        for (source,ann) in self.sources:
+            if source.source_type_id() == tid:
+                res.append(source)
+        return res
     def movement_data(self):
         ann_lst = copy.copy(self.annotations)
         ann_lst.sort(cmp=lambda (name1,start1,end1),(name2,start2,end2): cmp(start1,start2))
-        src1 = self.get_source_by_short('m0').get_preprocessed_data()
-        src2 = self.get_source_by_short('m1').get_preprocessed_data()
-        for ((t1,var11,var12,var13,mean11,mean12,mean13),(t2,var21,var22,var23,mean21,mean22,mean23)) in zip(src1,src2):
-            #print t1,ann_lst
-            while ann_lst[0][2] < t1:
+        srcs = self.get_sources_by_type_id("movement")
+        for entr in zip(*(src.get_preprocessed_data() for src in srcs)):
+            while ann_lst[0][2] < entr[0][0]:
                 del ann_lst[0]
                 if len(ann_lst) == 0:
                     return
-            if ann_lst[0][1] < t1:
-                yield (ann_lst[0][0],var11,var12,var13,mean11,mean12,mean13,var21,var22,var23,mean21,mean22,mean23)
-        
+            if ann_lst[0][1] < entr[0][0]:
+                res = [ann_lst[0][0]]
+                for e in entr:
+                    res += e[1:]
+                yield(res)
+                
 def parse_annotations(node):
     anns = []
     for ann in node.childNodes:
