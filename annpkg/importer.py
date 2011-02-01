@@ -76,8 +76,7 @@ class DynArray:
         if self.cur_arr is None:
             arr = [] + self.arrs
         else:
-            arr = [self.cur_arr[:sz]] + self.arrs
-        arr.reverse()
+            arr = self.arrs + [self.cur_arr[:sz]]
         if self.width is None:
             return np.hstack(arr)
         else:
