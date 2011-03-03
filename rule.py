@@ -102,7 +102,8 @@ class Classifier:
                  'mapping' : [ { 'class' : k, 'value' : float(v) } for (k,v) in self.membership ]
                  }
     def to_ini(self,cfgparser):
-        cfgparser.set("DEFAULT","dimension",self.dimension())
+        cfgparser.set("DEFAULT","dimensions",self.dimension())
+        cfgparser.set("DEFAULT","rules",len(self.ruleset.rules))
         self.ruleset.to_ini(cfgparser)        
     @staticmethod
     def from_json(node,dim):
